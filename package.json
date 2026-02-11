@@ -1,0 +1,22 @@
+{
+  "name": "screen-story",
+  "version": "1.0.0",
+  "description": "Turn screenpipe screenshots into short-form videos with AI summaries",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test-api.js",
+    "export": "node export-screenshots.js",
+    "video": "node create-video.js"
+  },
+  "keywords": ["screenpipe", "video", "ai", "claude", "ffmpeg", "screen-recording"],
+  "author": "Effy Zhang",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "fluent-ffmpeg": "^2.1.3",
+    "sharp": "^0.33.5"
+  }
+}
