@@ -92,7 +92,7 @@ async function exportScreenshots() {
           console.log('   🤖 Generating AI summary...');
 
           const message = await anthropic.messages.create({
-            model: 'claude-haiku-4-20250122',
+            model: 'claude-3-5-haiku-20241022',
             max_tokens: 100,
             messages: [{
               role: 'user',

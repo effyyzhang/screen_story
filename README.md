@@ -39,6 +39,28 @@ screenpipe --fps 0.2 --disable-audio --enable-frame-cache
 
 ## Usage
 
+### Quick Start/Stop Scripts
+
+**Desktop Shortcuts** (double-click):
+- `~/Desktop/ScreenStory/START.command` - Start screenpipe
+- `~/Desktop/ScreenStory/STOP.command` - Stop screenpipe
+- `~/Desktop/ScreenStory/STATUS.command` - Check status
+
+**Shell Aliases** (from anywhere in terminal):
+```bash
+screen-story-start   # Start screenpipe
+screen-story-stop    # Stop screenpipe
+screen-story-status  # Check status
+screen-story         # Go to project directory
+```
+
+**Direct Scripts** (from project directory):
+```bash
+./start.sh    # Start screenpipe
+./stop.sh     # Stop screenpipe
+./status.sh   # Check status
+```
+
 ### Test screenpipe connection
 ```bash
 npm test

@@ -6,3 +6,9 @@ exports/
 *.mp4
 *.mov
 .screenpipe-recordings/
+sessions/*/
+sessions/*.db
+sessions/*.db-shm
+sessions/*.db-wal
+videos/
+test-*.js
