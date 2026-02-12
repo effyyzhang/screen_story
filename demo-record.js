@@ -126,12 +126,13 @@ async function main() {
     console.log('🔴 Recording for 30 seconds...\n');
 
     const result = await MultiWindowCapture.monitorTaskWindows(
-      '', // No task description
+      '', // No task description for manual mode
       outputDir,
       {
         interval: 5000,
         duration: 30000,
         captureActive: true,
+        manualApps: apps, // Use manual app list
         onCapture: (info) => {
           const successCount = info.results.filter(r => r.success).length;
           console.log(`  Frame ${info.frameNumber}: Active + ${successCount}/${apps.length} apps`);
