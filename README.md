@@ -4,10 +4,28 @@ Turn your screen activity into shareable short-form videos with AI-powered summa
 
 ## What it does
 
-1. **Captures** your screen every 5-10 seconds using screenpipe
-2. **Analyzes** screenshots with Claude Haiku to generate summaries
-3. **Compiles** frames into professional videos with subtitles
-4. **Exports** in multiple formats (vertical 9:16, square 1:1, horizontal 16:9)
+**Screen Story** is an AI-powered screen recording and video creation tool with 4 intelligent phases:
+
+### Phase 1: Intelligent Capture
+- **Auto-capture**: Timer-based screenshots (every 5-10s) or app-switch triggered
+- **Multi-window**: Capture background apps for demo videos (Terminal + Messages, etc.)
+- **Smart monitoring**: AI predicts which apps to capture based on task description
+
+### Phase 2: AI Analysis
+- **OCR**: Extract text from screenshots using macOS Vision API
+- **AI summaries**: Claude Haiku analyzes each screenshot and generates captions
+- **Relevance scoring**: 0-100% score for intelligent video pacing
+- **Success detection**: Identifies "hero moments" for highlights
+
+### Phase 3: Smart Search
+- **Full-text search**: Query screenshots by OCR text, AI summaries, or tags
+- **Virtual sessions**: Group screenshots from multiple sessions
+- **Task detection**: AI identifies what you accomplished
+
+### Phase 4: Professional Video Export
+- **FFmpeg videos**: Quick automated videos with intelligent pacing (1-3s per frame based on relevance)
+- **JianYing export**: Professional editing with captions, transitions, effects
+- **Multiple formats**: Standard, hero-only, enhanced with overlays
 
 ## Setup
 
@@ -71,20 +89,96 @@ npm test
 npm run export
 ```
 
-### Create video
+### Create videos
+
+**Quick FFmpeg videos** (automated, fast):
 ```bash
-npm run video
+# Standard video
+node create-video.js <session-name>
+
+# Hero highlights only
+node create-video.js <session-name> --hero-only
+
+# Enhanced with captions, timestamps, progress bar
+node create-enhanced-video.js <session-name>
+```
+
+**Professional JianYing export** (for manual editing):
+```bash
+# Export to JianYing-compatible format
+node export-jianying.js <session-name>
+
+# Then import into JianYing desktop app
+# See JIANYING_INTEGRATION.md for details
+```
+
+### Multi-window demo recording
+```bash
+# Smart recording (AI predicts apps to capture)
+node demo-record.js smart-record "Send iMessage using AI agent"
+
+# Manual recording (specify apps)
+node demo-record.js manual-record "Messages" "Terminal"
+
+# See which apps to monitor
+node demo-record.js list-apps
 ```
 
 ## Project Structure
 
 ```
 screen_story/
-├── test-api.js              # Test screenpipe connection
-├── export-screenshots.js    # Export & summarize screenshots
-├── create-video.js          # Generate videos with FFmpeg
-├── package.json
-└── .env                     # API keys (not committed)
+├── lib/
+│   ├── screenshot.js           # Phase 1: Screenshot capture
+│   ├── ocr.js                  # macOS Vision OCR
+│   ├── ai-analyzer.js          # Phase 2: AI analysis with Claude
+│   ├── database.js             # SQLite with FTS5 search
+│   ├── video-editor.js         # Phase 4: FFmpeg video creation
+│   ├── video-enhancements.js   # Text overlays, transitions, effects
+│   ├── jianying-export.js      # JianYing draft project export
+│   └── multi-window-capture.js # Background app capture for demos
+├── capture-daemon.js           # Start/stop capture daemon
+├── analyze-session.js          # Run AI analysis on session
+├── search-screenshots.js       # Search with FTS5
+├── create-video.js             # Create standard videos
+├── create-enhanced-video.js    # Create videos with overlays
+├── export-jianying.js          # Export to JianYing format
+├── demo-record.js              # Multi-window demo recording
+├── sessions/                   # Screenshot sessions
+├── videos/                     # Exported videos
+├── exports/                    # JianYing exports
+└── JIANYING_INTEGRATION.md     # JianYing setup guide
+```
+
+## Key Features
+
+### Intelligent Pacing
+Videos automatically adjust frame duration (1-3s) based on AI relevance scores:
+- Hero moments (≥80%): 3 seconds
+- Important (50-80%): 2 seconds
+- Context (<50%): 1 second
+
+### Multi-Window Demos
+Perfect for recording AI agent workflows:
+```bash
+node demo-record.js smart-record "Agent sends iMessage"
+# Captures: Terminal (active) + Messages (background) every 5s
+```
+
+### JianYing Integration
+Export to professional video editor with:
+- AI-generated captions
+- Intelligent pacing recommendations
+- Timestamps and success indicators
+- See `JIANYING_INTEGRATION.md` for setup
+
+### Search & Discovery
+```bash
+# Full-text search
+node search-screenshots.js "error message"
+
+# Create virtual sessions
+node create-virtual-session.js --name "debugging" --task "fix login bug"
 ```
 
 ## Cost
