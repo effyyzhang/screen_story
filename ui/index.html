@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screen Story</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <h1>📹 Screen Story</h1>
+      <div class="header-actions">
+        <div class="capture-status" id="captureStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">Idle</span>
+        </div>
+        <button class="btn btn-primary" id="captureBtn">Start Capture</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>Navigation</h3>
+          <nav class="nav">
+            <a href="#" class="nav-item active" data-view="sessions">
+              <span>📂</span> Sessions
+            </a>
+            <a href="#" class="nav-item" data-view="search">
+              <span>🔍</span> Search
+            </a>
+            <a href="#" class="nav-item" data-view="export">
+              <span>🎬</span> Export
+            </a>
+          </nav>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Stats</h3>
+          <div class="stats" id="stats">
+            <div class="stat-item">
+              <div class="stat-value">-</div>
+              <div class="stat-label">Sessions</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">-</div>
+              <div class="stat-label">Screenshots</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">-</div>
+              <div class="stat-label">Analyzed</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Content Area -->
+      <main class="content">
+        <!-- Sessions View -->
+        <div class="view active" id="sessionsView">
+          <div class="view-header">
+            <h2>Sessions</h2>
+            <input type="text" class="search-input" placeholder="Filter sessions..." id="sessionFilter">
+          </div>
+          <div class="sessions-grid" id="sessionsGrid">
+            <div class="loading">Loading sessions...</div>
+          </div>
+        </div>
+
+        <!-- Search View -->
+        <div class="view" id="searchView">
+          <div class="view-header">
+            <h2>Search Screenshots</h2>
+            <div class="search-box">
+              <input type="text" class="search-input large" placeholder="Search by text, AI summary, or tags..." id="searchInput">
+              <button class="btn" id="searchBtn">Search</button>
+            </div>
+          </div>
+          <div class="search-results" id="searchResults">
+            <div class="empty-state">Enter a search query to find screenshots</div>
+          </div>
+        </div>
+
+        <!-- Export View -->
+        <div class="view" id="exportView">
+          <div class="view-header">
+            <h2>Export Video</h2>
+          </div>
+          <div class="export-panel" id="exportPanel">
+            <div class="form-group">
+              <label>Select Session</label>
+              <select class="select" id="exportSessionSelect">
+                <option value="">Loading sessions...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="heroOnlyCheckbox">
+                Hero moments only (≥70% relevance)
+              </label>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" id="exportBtn">Create Video</button>
+            </div>
+            <div class="export-output" id="exportOutput"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Session Detail Modal -->
+  <div class="modal" id="sessionModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Session Details</h2>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Capture Modal -->
+  <div class="modal" id="captureModal">
+    <div class="modal-content small">
+      <div class="modal-header">
+        <h2>Start Capture</h2>
+        <button class="modal-close" id="captureModalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Session Name</label>
+          <input type="text" class="input" id="sessionNameInput" placeholder="my-recording">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" class="input" id="sessionDescInput" placeholder="What are you working on?">
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" id="captureCancelBtn">Cancel</button>
+          <button class="btn btn-primary" id="captureStartBtn">Start Recording</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
