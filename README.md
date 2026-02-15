@@ -24,6 +24,7 @@ Turn your screen activity into shareable short-form videos with AI-powered summa
 
 ### Phase 4: Professional Video Export
 - **FFmpeg videos**: Quick automated videos with intelligent pacing (1-3s per frame based on relevance)
+- **JianYing MCP**: Automated import to JianYing/CapCut via local MCP server
 - **JianYing export**: Professional editing with captions, transitions, effects
 - **Multiple formats**: Standard, hero-only, enhanced with overlays
 
@@ -103,13 +104,16 @@ node create-video.js <session-name> --hero-only
 node create-enhanced-video.js <session-name>
 ```
 
-**Professional JianYing export** (for manual editing):
+**Professional JianYing export**:
 ```bash
 # Export to JianYing-compatible format
 node export-jianying.js <session-name>
 
-# Then import into JianYing desktop app
-# See JIANYING_INTEGRATION.md for details
+# Automated import via MCP (requires Claude Desktop)
+# Just tell Claude: "Import my Screen Story draft to JianYing"
+
+# Manual import (see JIANYING_INTEGRATION.md)
+# Drag screenshots to JianYing timeline
 ```
 
 ### Multi-window demo recording

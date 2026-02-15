@@ -1,0 +1,19 @@
+{
+  "name": "@effyos/jianying-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for JianYing (CapCut) video editor automation",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "jianying-mcp": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["mcp", "jianying", "capcut", "video", "automation"],
+  "author": "effyos",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}
