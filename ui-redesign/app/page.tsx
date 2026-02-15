@@ -17,9 +17,19 @@ export default function Home() {
   const [activeFolder, setActiveFolder] = useState<string | null>(null) // e.g., "app:Chrome", "session:1"
   const [selectedScreenshot, setSelectedScreenshot] = useState<Screenshot | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
 
   // Detect active recording session
   const { isRecording, activeSession } = useActiveSession()
+
+  // Debounce search input (300ms delay)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
 
   // Fetch folder counts for sidebar (poll when recording)
   const { data: folderCounts, loading: countsLoading, error: countsError } = useFolderCounts({
@@ -32,6 +42,11 @@ export default function Home() {
     const filters: any = {
       limit: 100,
       sort: 'timestamp-desc',
+    }
+
+    // Add search query
+    if (debouncedSearch.trim()) {
+      filters.q = debouncedSearch.trim()
     }
 
     // If a specific folder is selected, use that
@@ -47,7 +62,7 @@ export default function Home() {
     // 'all' filter doesn't need a folder parameter
 
     return filters
-  }, [activeFilter, activeFolder])
+  }, [activeFilter, activeFolder, debouncedSearch])
 
   // Fetch screenshots based on filters (poll when recording)
   const { screenshots, total, loading: screenshotsLoading, error: screenshotsError } = useScreenshots(
@@ -82,6 +97,11 @@ export default function Home() {
     setActiveFolder(folder)
     setActiveFilter('all') // Reset quick access when selecting folder
     setSelectedScreenshot(null) // Close detail view
+  }
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query)
+    setSelectedScreenshot(null) // Close detail view on search
   }
 
   const handleStartCapture = async () => {
@@ -134,7 +154,7 @@ export default function Home() {
             {countsError?.message || screenshotsError?.message}
           </p>
           <p className="text-text-secondary text-sm">
-            Make sure the backend server is running on http://localhost:3001
+            Make sure the backend server is running on http://localhost:4000
           </p>
           <button
             onClick={() => window.location.reload()}
@@ -152,6 +172,8 @@ export default function Home() {
       <Header
         isRecording={isRecording}
         screenshotCount={total}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
         onStartCapture={handleStartCapture}
         onStopCapture={handleStopCapture}
       />

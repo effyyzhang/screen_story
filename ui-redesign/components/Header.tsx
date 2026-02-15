@@ -7,11 +7,13 @@ import { useState } from 'react'
 interface HeaderProps {
   isRecording: boolean
   screenshotCount?: number
+  searchQuery: string
+  onSearchChange: (query: string) => void
   onStartCapture: () => void
   onStopCapture: () => void
 }
 
-export function Header({ isRecording, screenshotCount = 0, onStartCapture, onStopCapture }: HeaderProps) {
+export function Header({ isRecording, screenshotCount = 0, searchQuery, onSearchChange, onStartCapture, onStopCapture }: HeaderProps) {
   const [searchFocused, setSearchFocused] = useState(false)
 
   return (
@@ -32,6 +34,8 @@ export function Header({ isRecording, screenshotCount = 0, onStartCapture, onSto
         <input
           type="search"
           placeholder="Search screenshots..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
           className="w-full h-8 bg-bg-app border border-border rounded-md pl-9 pr-3 text-sm text-text-primary placeholder:text-text-tertiary focus:border-accent focus:outline-none transition-colors"
           onFocus={() => setSearchFocused(true)}
           onBlur={() => setSearchFocused(false)}
