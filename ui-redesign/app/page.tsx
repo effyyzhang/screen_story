@@ -5,146 +5,195 @@ import { Header } from '@/components/Header'
 import { Sidebar } from '@/components/Sidebar'
 import { ScreenshotGrid } from '@/components/ScreenshotGrid'
 import { PropertiesPanel } from '@/components/PropertiesPanel'
-import { type Screenshot, type Session, type FilterType } from '@/lib/types'
-
-// Mock data - replace with real data from your backend
-const mockSessions: Session[] = [
-  {
-    id: '1',
-    name: 'jianying-mcp-test',
-    description: 'Testing JianYing MCP integration',
-    createdAt: '2026-02-15T10:00:00Z',
-    duration: '9 min',
-    screenshots: [
-      {
-        id: '1',
-        path: '/api/placeholder/800/500',
-        timestamp: '2026-02-15T10:05:00Z',
-        aiSummary: 'User navigating to settings panel in Claude Desktop',
-        relevance: 85,
-        size: '2.4 MB',
-        type: 'PNG',
-        width: 1920,
-        height: 1080,
-      },
-      {
-        id: '2',
-        path: '/api/placeholder/800/500',
-        timestamp: '2026-02-15T10:06:00Z',
-        aiSummary: 'Terminal window showing git commit command',
-        relevance: 72,
-        size: '1.8 MB',
-        type: 'PNG',
-        width: 1920,
-        height: 1080,
-      },
-      {
-        id: '3',
-        path: '/api/placeholder/800/500',
-        timestamp: '2026-02-15T10:07:00Z',
-        aiSummary: 'Browser displaying JianYing project documentation',
-        relevance: 45,
-        size: '3.1 MB',
-        type: 'PNG',
-        width: 1920,
-        height: 1080,
-      },
-      {
-        id: '4',
-        path: '/api/placeholder/800/500',
-        timestamp: '2026-02-15T10:08:00Z',
-        aiSummary: 'Code editor with TypeScript interface definition',
-        relevance: 90,
-        size: '2.2 MB',
-        type: 'PNG',
-        width: 1920,
-        height: 1080,
-      },
-      {
-        id: '5',
-        path: '/api/placeholder/800/500',
-        timestamp: '2026-02-15T10:09:00Z',
-        aiSummary: 'JianYing desktop app showing imported project',
-        relevance: 95,
-        size: '4.5 MB',
-        type: 'PNG',
-        width: 1920,
-        height: 1080,
-      },
-    ],
-  },
-  {
-    id: '2',
-    name: 'screen-story-completion',
-    createdAt: '2026-02-11T07:25:00Z',
-    duration: '2 min',
-    screenshots: [],
-  },
-]
+import { ResizablePanel } from '@/components/ResizablePanel'
+import { useFolderCounts } from '@/hooks/useFolderCounts'
+import { useScreenshots } from '@/hooks/useScreenshots'
+import { useActiveSession } from '@/hooks/useActiveSession'
+import { getThumbnailUrl } from '@/lib/api'
+import { type Screenshot, type FilterType } from '@/lib/types'
 
 export default function Home() {
-  const [isRecording, setIsRecording] = useState(false)
   const [activeFilter, setActiveFilter] = useState<FilterType>('all')
-  const [activeSession, setActiveSession] = useState<string | null>(mockSessions[0].id)
+  const [activeFolder, setActiveFolder] = useState<string | null>(null) // e.g., "app:Chrome", "session:1"
   const [selectedScreenshot, setSelectedScreenshot] = useState<Screenshot | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
 
-  const currentSession = useMemo(
-    () => mockSessions.find((s) => s.id === activeSession),
-    [activeSession]
+  // Detect active recording session
+  const { isRecording, activeSession } = useActiveSession()
+
+  // Fetch folder counts for sidebar (poll when recording)
+  const { data: folderCounts, loading: countsLoading, error: countsError } = useFolderCounts({
+    polling: isRecording,
+    pollingInterval: 30000, // 30 seconds
+  })
+
+  // Build filter parameter based on active selections
+  const screenshotFilters = useMemo(() => {
+    const filters: any = {
+      limit: 100,
+      sort: 'timestamp-desc',
+    }
+
+    // If a specific folder is selected, use that
+    if (activeFolder) {
+      filters.folder = activeFolder
+    }
+    // Otherwise, use the quick access filter
+    else if (activeFilter === 'hero') {
+      filters.folder = 'success:hero'
+    } else if (activeFilter === 'success') {
+      filters.folder = 'success:success'
+    }
+    // 'all' filter doesn't need a folder parameter
+
+    return filters
+  }, [activeFilter, activeFolder])
+
+  // Fetch screenshots based on filters (poll when recording)
+  const { screenshots, total, loading: screenshotsLoading, error: screenshotsError } = useScreenshots(
+    screenshotFilters,
+    {
+      polling: isRecording,
+      pollingInterval: 10000, // 10 seconds - matches capture interval
+    }
   )
 
-  const filteredScreenshots = useMemo(() => {
-    if (!currentSession) return []
+  const handleScreenshotClick = (screenshot: Screenshot) => {
+    // Immediate visual feedback - no waiting for image load
+    setIsTransitioning(true)
+    setSelectedScreenshot(screenshot)
+    // Reset transition state after animation
+    setTimeout(() => setIsTransitioning(false), 200)
+  }
 
-    switch (activeFilter) {
-      case 'hero':
-        return currentSession.screenshots.filter((s) => s.relevance >= 80)
-      case 'success':
-        return currentSession.screenshots.filter((s) => s.relevance >= 50 && s.relevance < 80)
-      case 'all':
-      default:
-        return currentSession.screenshots
-    }
-  }, [currentSession, activeFilter])
+  const handleCloseDetail = () => {
+    setIsTransitioning(true)
+    setSelectedScreenshot(null)
+    setTimeout(() => setIsTransitioning(false), 200)
+  }
 
+  const handleFilterChange = (filter: FilterType) => {
+    setActiveFilter(filter)
+    setActiveFolder(null) // Clear folder selection when changing quick access
+    setSelectedScreenshot(null) // Close detail view
+  }
+
+  const handleFolderChange = (folder: string) => {
+    setActiveFolder(folder)
+    setActiveFilter('all') // Reset quick access when selecting folder
+    setSelectedScreenshot(null) // Close detail view
+  }
+
+  // Format session meta information
   const sessionMeta = useMemo(() => {
-    if (!currentSession) return ''
-    return `${filteredScreenshots.length} screenshots • ${currentSession.duration}`
-  }, [currentSession, filteredScreenshots])
+    if (!folderCounts) return ''
+    return `${total} screenshots`
+  }, [total, folderCounts])
+
+  // Show loading state
+  if (countsLoading || screenshotsLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-bg-app">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-border border-t-accent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-text-secondary">Loading screenshots...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state
+  if (countsError || screenshotsError) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-bg-app">
+        <div className="text-center max-w-md">
+          <p className="text-red-500 mb-4">Failed to load data</p>
+          <p className="text-text-tertiary text-sm mb-4">
+            {countsError?.message || screenshotsError?.message}
+          </p>
+          <p className="text-text-secondary text-sm">
+            Make sure the backend server is running on http://localhost:3001
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-md text-sm"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <Header
         isRecording={isRecording}
-        onStartCapture={() => setIsRecording(true)}
-        onStopCapture={() => setIsRecording(false)}
+        screenshotCount={total}
+        onStartCapture={() => {}} // Now handled by daemon directly
+        onStopCapture={() => {}} // Now handled by daemon directly
       />
 
       <div className="flex-1 flex overflow-hidden">
-        <Sidebar
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          sessions={mockSessions}
-          activeSession={activeSession}
-          onSessionChange={setActiveSession}
-        />
+        {/* Left Sidebar - Fixed width */}
+        <div className="w-60 flex-shrink-0">
+          <Sidebar
+            activeFilter={activeFilter}
+            onFilterChange={handleFilterChange}
+            activeFolder={activeFolder}
+            onFolderChange={handleFolderChange}
+            folderCounts={folderCounts}
+          />
+        </div>
 
-        <ScreenshotGrid
-          screenshots={filteredScreenshots}
-          sessionName={currentSession?.name || ''}
-          sessionMeta={sessionMeta}
-          onScreenshotClick={setSelectedScreenshot}
-        />
+        {/* Center Content - Grid or Detail View */}
+        <div className="flex-1 overflow-hidden relative">
+          {selectedScreenshot ? (
+            // Detail View - Large preview with loading state
+            <div className="h-full flex items-center justify-center bg-bg-app p-8">
+              {/* Loading placeholder - shows immediately */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-32 h-32 bg-bg-surface rounded-lg animate-pulse" />
+              </div>
+              {/* Actual image - loads in background */}
+              <img
+                src={getThumbnailUrl(selectedScreenshot.file_path, 'full')}
+                alt="Detail view"
+                className="max-w-full max-h-full object-contain rounded-lg cursor-pointer relative z-10"
+                onClick={handleCloseDetail}
+                loading="eager"
+                onLoad={(e) => {
+                  // Hide placeholder once loaded
+                  const placeholder = e.currentTarget.previousElementSibling as HTMLElement
+                  if (placeholder) placeholder.style.display = 'none'
+                }}
+              />
+            </div>
+          ) : (
+            // Grid View
+            <ScreenshotGrid
+              screenshots={screenshots}
+              sessionName={activeFolder || 'All Screenshots'}
+              sessionMeta={sessionMeta}
+              onScreenshotClick={handleScreenshotClick}
+            />
+          )}
+        </div>
 
-        <PropertiesPanel
-          screenshot={selectedScreenshot}
-          onExportToJianying={() => {
-            console.log('Export to JianYing:', selectedScreenshot)
-          }}
-          onCreateVideo={() => {
-            console.log('Create video:', selectedScreenshot)
-          }}
-        />
+        {/* Right Panel - Only visible in detail view, draggable */}
+        {selectedScreenshot && (
+          <ResizablePanel defaultWidth={320} minWidth={280} maxWidth={500} side="right">
+            <PropertiesPanel
+              screenshot={selectedScreenshot}
+              onExportToJianying={() => {
+                console.log('Export to JianYing:', selectedScreenshot)
+              }}
+              onCreateVideo={() => {
+                console.log('Create video:', selectedScreenshot)
+              }}
+            />
+          </ResizablePanel>
+        )}
       </div>
     </div>
   )

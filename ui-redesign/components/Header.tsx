@@ -6,11 +6,12 @@ import { useState } from 'react'
 
 interface HeaderProps {
   isRecording: boolean
+  screenshotCount?: number
   onStartCapture: () => void
   onStopCapture: () => void
 }
 
-export function Header({ isRecording, onStartCapture, onStopCapture }: HeaderProps) {
+export function Header({ isRecording, screenshotCount = 0, onStartCapture, onStopCapture }: HeaderProps) {
   const [searchFocused, setSearchFocused] = useState(false)
 
   return (
@@ -39,29 +40,40 @@ export function Header({ isRecording, onStartCapture, onStopCapture }: HeaderPro
 
       <div className="flex-1" />
 
-      {/* Status indicator */}
-      <div className="flex items-center gap-2 px-3 py-1.5 bg-bg-surface rounded-md">
+      {/* Recording Status Indicator */}
+      {isRecording && (
         <motion.div
-          animate={{
-            scale: isRecording ? [1, 1.2, 1] : 1,
-            opacity: isRecording ? [1, 0.6, 1] : 1,
-          }}
-          transition={{
-            duration: 2,
-            repeat: isRecording ? Infinity : 0,
-            ease: 'easeInOut',
-          }}
+          className="flex items-center gap-2 px-3 py-1.5 bg-[#1C0F0F] border border-[#3D1515] rounded-md"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.2 }}
         >
-          <Circle
-            className={`w-2 h-2 ${
-              isRecording ? 'fill-error text-error' : 'fill-text-tertiary text-text-tertiary'
-            }`}
-          />
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [1, 0.3, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          >
+            <Circle className="w-2 h-2 fill-[#FF4444] text-[#FF4444]" />
+          </motion.div>
+          <span className="text-xs text-[#FF9999] font-medium">
+            Recording... {screenshotCount} screenshots
+          </span>
         </motion.div>
-        <span className="text-xs text-text-secondary">
-          {isRecording ? 'Recording' : 'Idle'}
-        </span>
-      </div>
+      )}
+
+      {/* Idle Status (subtle) */}
+      {!isRecording && (
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-bg-surface rounded-md">
+          <Circle className="w-2 h-2 fill-text-tertiary text-text-tertiary" />
+          <span className="text-xs text-text-secondary">Idle</span>
+        </div>
+      )}
 
       {/* Actions */}
       <button
@@ -69,13 +81,6 @@ export function Header({ isRecording, onStartCapture, onStopCapture }: HeaderPro
         aria-label="Settings"
       >
         <Settings className="w-4 h-4 text-text-secondary" />
-      </button>
-
-      <button
-        onClick={isRecording ? onStopCapture : onStartCapture}
-        className="h-8 px-4 bg-accent hover:bg-accent-hover text-white rounded-md text-sm font-medium transition-colors"
-      >
-        {isRecording ? '⏹ Stop' : '▶︎ Start Capture'}
       </button>
     </header>
   )
