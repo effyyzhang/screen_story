@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Eye, Download } from 'lucide-react'
 import { type Screenshot } from '@/lib/types'
 import { formatTime, getRelevanceColor } from '@/lib/utils'
+import { getThumbnailUrl } from '@/lib/api'
 import { useState } from 'react'
 
 interface ScreenshotCardProps {
@@ -13,6 +14,7 @@ interface ScreenshotCardProps {
 
 export function ScreenshotCard({ screenshot, onClick }: ScreenshotCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   return (
     <motion.div
@@ -21,15 +23,23 @@ export function ScreenshotCard({ screenshot, onClick }: ScreenshotCardProps) {
       onHoverEnd={() => setIsHovered(false)}
       onClick={onClick}
       whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
     >
       {/* Image */}
       <div className="aspect-[16/10] bg-bg-app relative overflow-hidden">
+        {/* Loading placeholder */}
+        {!isLoaded && (
+          <div className="absolute inset-0 bg-bg-surface animate-pulse" />
+        )}
         <img
-          src={screenshot.path}
-          alt={screenshot.aiSummary}
-          className="w-full h-full object-cover"
+          src={getThumbnailUrl(screenshot.file_path, 'thumb')}
+          alt={screenshot.ai_summary || 'Screenshot'}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
           loading="lazy"
+          onLoad={() => setIsLoaded(true)}
         />
 
         {/* Hover Overlay */}
@@ -51,13 +61,13 @@ export function ScreenshotCard({ screenshot, onClick }: ScreenshotCardProps) {
             </motion.div>
             <motion.div
               className={`px-2 py-1 rounded text-xs font-medium backdrop-blur-sm ${getRelevanceColor(
-                screenshot.relevance
+                screenshot.relevance_display
               )}`}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : -10 }}
               transition={{ duration: 0.2, delay: 0.1 }}
             >
-              {screenshot.relevance}%
+              {screenshot.relevance_display}%
             </motion.div>
           </div>
 
@@ -68,7 +78,7 @@ export function ScreenshotCard({ screenshot, onClick }: ScreenshotCardProps) {
             animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
             transition={{ duration: 0.2, delay: 0.1 }}
           >
-            <p className="text-xs text-white mb-2 line-clamp-2">{screenshot.aiSummary}</p>
+            <p className="text-xs text-white mb-2 line-clamp-2">{screenshot.ai_summary || 'No description'}</p>
 
             {/* Quick actions */}
             <div className="flex gap-2">

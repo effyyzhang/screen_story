@@ -9,7 +9,7 @@ import { ResizablePanel } from '@/components/ResizablePanel'
 import { useFolderCounts } from '@/hooks/useFolderCounts'
 import { useScreenshots } from '@/hooks/useScreenshots'
 import { useActiveSession } from '@/hooks/useActiveSession'
-import { getThumbnailUrl } from '@/lib/api'
+import { getThumbnailUrl, startCapture, stopCapture } from '@/lib/api'
 import { type Screenshot, type FilterType } from '@/lib/types'
 
 export default function Home() {
@@ -84,6 +84,28 @@ export default function Home() {
     setSelectedScreenshot(null) // Close detail view
   }
 
+  const handleStartCapture = async () => {
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+      const sessionName = `recording-${timestamp}`
+      await startCapture(sessionName, 'Screen recording session')
+      console.log('✅ Recording started:', sessionName)
+    } catch (error) {
+      console.error('❌ Failed to start recording:', error)
+      alert('Failed to start recording. Make sure the backend server is running.')
+    }
+  }
+
+  const handleStopCapture = async () => {
+    try {
+      await stopCapture()
+      console.log('⏹ Recording stopped')
+    } catch (error) {
+      console.error('❌ Failed to stop recording:', error)
+      alert('Failed to stop recording.')
+    }
+  }
+
   // Format session meta information
   const sessionMeta = useMemo(() => {
     if (!folderCounts) return ''
@@ -130,8 +152,8 @@ export default function Home() {
       <Header
         isRecording={isRecording}
         screenshotCount={total}
-        onStartCapture={() => {}} // Now handled by daemon directly
-        onStopCapture={() => {}} // Now handled by daemon directly
+        onStartCapture={handleStartCapture}
+        onStopCapture={handleStopCapture}
       />
 
       <div className="flex-1 flex overflow-hidden">

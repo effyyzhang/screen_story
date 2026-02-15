@@ -1,9 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { FileImage, Clock, HardDrive, Film } from 'lucide-react'
+import { FileImage, Clock, HardDrive, Film, Monitor } from 'lucide-react'
 import { type Screenshot } from '@/lib/types'
 import { formatTime, formatFileSize, getRelevanceLabel } from '@/lib/utils'
+import { getThumbnailUrl } from '@/lib/api'
 
 interface PropertiesPanelProps {
   screenshot: Screenshot | null
@@ -18,7 +19,7 @@ export function PropertiesPanel({
 }: PropertiesPanelProps) {
   if (!screenshot) {
     return (
-      <aside className="w-70 bg-bg-sidebar border-l border-border flex-shrink-0 flex items-center justify-center">
+      <aside className="w-full h-full bg-bg-sidebar border-l border-border flex items-center justify-center">
         <div className="text-center text-text-tertiary text-sm">
           <FileImage className="w-12 h-12 mx-auto mb-2 opacity-20" />
           <p>Select a screenshot</p>
@@ -27,10 +28,10 @@ export function PropertiesPanel({
     )
   }
 
-  const relevancePercent = screenshot.relevance
+  const relevancePercent = screenshot.relevance_display || screenshot.relevance_score * 100
 
   return (
-    <aside className="w-70 bg-bg-sidebar border-l border-border flex-shrink-0 overflow-y-auto">
+    <aside className="w-full h-full bg-bg-sidebar border-l border-border overflow-y-auto">
       <div className="p-4 space-y-5">
         {/* Preview */}
         <motion.div
@@ -39,7 +40,7 @@ export function PropertiesPanel({
           transition={{ duration: 0.3 }}
         >
           <img
-            src={screenshot.path}
+            src={getThumbnailUrl(screenshot.file_path, 'medium')}
             alt="Preview"
             className="w-full rounded-md border border-border"
           />
@@ -53,12 +54,12 @@ export function PropertiesPanel({
 
           <div className="space-y-2">
             <PropertyRow icon={Clock} label="Time" value={formatTime(screenshot.timestamp)} />
-            <PropertyRow icon={HardDrive} label="Size" value={screenshot.size} />
-            <PropertyRow icon={FileImage} label="Type" value={screenshot.type} />
+            <PropertyRow icon={Monitor} label="App" value={screenshot.app_name} />
+            <PropertyRow icon={FileImage} label="Window" value={screenshot.window_title} />
             <PropertyRow
               icon={FileImage}
               label="Dimensions"
-              value={`${screenshot.width} × ${screenshot.height}`}
+              value={screenshot.window_info?.dimensions || `${screenshot.window_width} × ${screenshot.window_height}`}
             />
           </div>
         </div>
@@ -69,7 +70,7 @@ export function PropertiesPanel({
             AI Analysis
           </h3>
 
-          <p className="text-sm text-text-secondary leading-relaxed">{screenshot.aiSummary}</p>
+          <p className="text-sm text-text-secondary leading-relaxed">{screenshot.ai_summary || 'No AI summary available'}</p>
 
           {/* Relevance meter */}
           <div className="space-y-2">

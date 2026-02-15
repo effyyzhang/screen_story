@@ -120,24 +120,32 @@ class CaptureDaemon {
       // Get session directory
       const sessionDir = path.join(__dirname, 'sessions', this.currentSession.session_name);
 
-      // Get active window info
-      const { appName, windowTitle } = await WindowInfo.getActiveWindow();
+      // Get active window info WITH bounds
+      const windowInfo = await WindowInfo.getActiveWindowBounds();
 
-      // Capture screenshot
+      // Capture full screenshot (NO cropping during capture)
       const { path: screenshotPath, timestamp } = await ScreenshotCapture.capture(sessionDir, this.frameNumber);
 
-      // Save to database
+      // Save to database with window bounds metadata
       this.db.addScreenshot(
         this.currentSession.id,
         this.frameNumber,
         timestamp,
-        appName,
-        windowTitle,
-        screenshotPath
+        windowInfo.appName,
+        windowInfo.windowTitle,
+        screenshotPath,
+        windowInfo.bounds // Store bounds, but don't crop yet
       );
 
+      // Enhanced logging with window info
       const time = new Date(timestamp).toLocaleTimeString();
-      console.log(`📸 [${trigger}] Frame ${this.frameNumber} - ${appName} - ${time}`);
+      const windowStatus = windowInfo.bounds
+        ? (windowInfo.bounds.isFullscreen
+            ? 'Fullscreen'
+            : `${windowInfo.bounds.width}×${windowInfo.bounds.height} window`)
+        : 'Unknown';
+
+      console.log(`📸 [${trigger}] Frame ${this.frameNumber} - ${windowInfo.appName} - ${windowStatus} - ${time}`);
     } catch (error) {
       console.error(`❌ Error capturing screenshot: ${error.message}`);
     }

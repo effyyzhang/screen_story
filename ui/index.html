@@ -10,8 +10,12 @@
   <div class="app">
     <!-- Header -->
     <header class="header">
-      <h1>📹 Screen Story</h1>
+      <div class="header-left">
+        <h1>📹 Screen Story</h1>
+      </div>
       <div class="header-actions">
+        <button class="btn btn-icon" id="settingsBtn" title="Settings">⚙️</button>
+        <button class="btn btn-primary" id="videoBtn">📹 Create Video</button>
         <div class="capture-status" id="captureStatus">
           <span class="status-dot"></span>
           <span class="status-text">Idle</span>
@@ -20,108 +24,338 @@
       </div>
     </header>
 
-    <!-- Main Content -->
-    <div class="main">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="sidebar-section">
-          <h3>Navigation</h3>
-          <nav class="nav">
-            <a href="#" class="nav-item active" data-view="sessions">
-              <span>📂</span> Sessions
-            </a>
-            <a href="#" class="nav-item" data-view="search">
-              <span>🔍</span> Search
-            </a>
-            <a href="#" class="nav-item" data-view="export">
-              <span>🎬</span> Export
-            </a>
-          </nav>
+    <!-- Main 3-Column Layout -->
+    <div class="main-layout">
+
+      <!-- LEFT: Folders Sidebar (240px fixed) -->
+      <aside class="folders-sidebar">
+        <div class="folder-section">
+          <h3>Quick Access</h3>
+          <div class="folder-list">
+            <div class="folder-item active" data-folder="all">
+              <span class="folder-icon">📷</span>
+              <span class="folder-label">All Screenshots</span>
+              <span class="folder-count" id="allCount">-</span>
+            </div>
+            <div class="folder-item" data-folder="success:hero">
+              <span class="folder-icon">⭐</span>
+              <span class="folder-label">Hero Moments</span>
+              <span class="folder-count" id="heroCount">-</span>
+            </div>
+            <div class="folder-item" data-folder="success:success">
+              <span class="folder-icon">✓</span>
+              <span class="folder-label">Success</span>
+              <span class="folder-count" id="successCount">-</span>
+            </div>
+          </div>
         </div>
 
-        <div class="sidebar-section">
-          <h3>Stats</h3>
-          <div class="stats" id="stats">
-            <div class="stat-item">
-              <div class="stat-value">-</div>
-              <div class="stat-label">Sessions</div>
+        <div class="folder-section">
+          <h3>By App</h3>
+          <div class="folder-list" id="appFolders">
+            <div class="folder-loading">Loading apps...</div>
+          </div>
+        </div>
+
+        <div class="folder-section">
+          <h3>By Time</h3>
+          <div class="folder-list">
+            <div class="folder-item" data-folder="time:today">
+              <span class="folder-icon">📅</span>
+              <span class="folder-label">Today</span>
+              <span class="folder-count" id="todayCount">-</span>
             </div>
-            <div class="stat-item">
-              <div class="stat-value">-</div>
-              <div class="stat-label">Screenshots</div>
+            <div class="folder-item" data-folder="time:yesterday">
+              <span class="folder-icon">📅</span>
+              <span class="folder-label">Yesterday</span>
+              <span class="folder-count" id="yesterdayCount">-</span>
             </div>
-            <div class="stat-item">
-              <div class="stat-value">-</div>
-              <div class="stat-label">Analyzed</div>
+            <div class="folder-item" data-folder="time:week">
+              <span class="folder-icon">📅</span>
+              <span class="folder-label">Last 7 days</span>
+              <span class="folder-count" id="weekCount">-</span>
             </div>
+            <div class="folder-item" data-folder="time:month">
+              <span class="folder-icon">📅</span>
+              <span class="folder-label">Last 30 days</span>
+              <span class="folder-count" id="monthCount">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="folder-section">
+          <h3>Sessions</h3>
+          <div class="folder-list" id="sessionFolders">
+            <div class="folder-loading">Loading sessions...</div>
           </div>
         </div>
       </aside>
 
-      <!-- Content Area -->
-      <main class="content">
-        <!-- Sessions View -->
-        <div class="view active" id="sessionsView">
-          <div class="view-header">
-            <h2>Sessions</h2>
-            <input type="text" class="search-input" placeholder="Filter sessions..." id="sessionFilter">
-          </div>
-          <div class="sessions-grid" id="sessionsGrid">
-            <div class="loading">Loading sessions...</div>
-          </div>
-        </div>
-
-        <!-- Search View -->
-        <div class="view" id="searchView">
-          <div class="view-header">
-            <h2>Search Screenshots</h2>
-            <div class="search-box">
-              <input type="text" class="search-input large" placeholder="Search by text, AI summary, or tags..." id="searchInput">
-              <button class="btn" id="searchBtn">Search</button>
+      <!-- MIDDLE: Screenshots Area (flex-1) -->
+      <main class="screenshots-area">
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="view-toggle">
+              <button class="toggle-btn active" data-view="grid">
+                <span>⊞</span> Grid
+              </button>
+              <button class="toggle-btn" data-view="list">
+                <span>☰</span> List
+              </button>
+            </div>
+            <div class="folder-breadcrumb" id="breadcrumb">
+              All Screenshots
             </div>
           </div>
-          <div class="search-results" id="searchResults">
-            <div class="empty-state">Enter a search query to find screenshots</div>
-          </div>
-        </div>
-
-        <!-- Export View -->
-        <div class="view" id="exportView">
-          <div class="view-header">
-            <h2>Export Video</h2>
-          </div>
-          <div class="export-panel" id="exportPanel">
-            <div class="form-group">
-              <label>Select Session</label>
-              <select class="select" id="exportSessionSelect">
-                <option value="">Loading sessions...</option>
+          <div class="toolbar-right">
+            <input type="text" class="search-input" placeholder="Search..." id="quickSearch">
+            <div class="sort-dropdown">
+              <select id="sortSelect">
+                <option value="timestamp-desc">Newest first</option>
+                <option value="timestamp-asc">Oldest first</option>
+                <option value="relevance-desc">Highest relevance</option>
+                <option value="relevance-asc">Lowest relevance</option>
               </select>
             </div>
-            <div class="form-group">
-              <label>
-                <input type="checkbox" id="heroOnlyCheckbox">
-                Hero moments only (≥70% relevance)
-              </label>
-            </div>
-            <div class="form-actions">
-              <button class="btn btn-primary" id="exportBtn">Create Video</button>
-            </div>
-            <div class="export-output" id="exportOutput"></div>
           </div>
         </div>
+
+        <!-- Advanced Filter Panel -->
+        <div class="filter-panel" id="filterPanel">
+          <div class="filter-header">
+            <div class="filter-title">
+              <span class="filter-icon">🔍</span>
+              <span>FILTERS</span>
+            </div>
+            <div class="filter-header-actions">
+              <button class="btn-text" id="clearAllFiltersBtn">Clear All</button>
+              <button class="btn-collapse" id="toggleFilterPanel">
+                <span class="collapse-icon">▼</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-body" id="filterBody">
+            <!-- General Search -->
+            <div class="filter-section">
+              <label class="filter-label">General Search</label>
+              <input
+                type="text"
+                class="filter-input"
+                id="generalSearchInput"
+                placeholder="Search screenshots by keywords, tags, content..."
+              >
+            </div>
+
+            <!-- Date Range -->
+            <div class="filter-section">
+              <label class="filter-label">Date Range</label>
+              <div class="date-range-inputs">
+                <div class="date-input-group">
+                  <label class="date-sublabel">From:</label>
+                  <input type="date" class="filter-input date-input" id="dateStartInput">
+                </div>
+                <div class="date-input-group">
+                  <label class="date-sublabel">To:</label>
+                  <input type="date" class="filter-input date-input" id="dateEndInput">
+                </div>
+              </div>
+              <div class="quick-date-buttons">
+                <button class="btn-quick-date" data-range="today">Today</button>
+                <button class="btn-quick-date" data-range="yesterday">Yesterday</button>
+                <button class="btn-quick-date" data-range="week">Last 7 days</button>
+                <button class="btn-quick-date" data-range="month">Last 30 days</button>
+              </div>
+            </div>
+
+            <!-- Apps (Multi-select) -->
+            <div class="filter-section">
+              <label class="filter-label">Apps (multi-select)</label>
+              <input
+                type="text"
+                class="filter-input"
+                id="appSearchInput"
+                placeholder="Search apps..."
+              >
+              <div class="app-checkbox-list" id="appCheckboxList">
+                <!-- Dynamic checkboxes populated by JavaScript -->
+              </div>
+            </div>
+
+            <!-- Apply Button -->
+            <div class="filter-section">
+              <button class="btn btn-primary btn-block" id="applyFiltersBtn">Apply Filters</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Filters Bar -->
+        <div class="active-filters-bar" id="activeFiltersBar" hidden>
+          <div class="active-filters-info">
+            <span id="activeFilterCount">0</span> filters active • <span id="filteredResultCount">0</span> results
+          </div>
+          <div class="filter-chips" id="filterChips">
+            <!-- Dynamic filter chips -->
+          </div>
+        </div>
+
+        <!-- Bulk actions bar (hidden until selection) -->
+        <div class="bulk-bar" id="bulkBar" hidden>
+          <div class="bulk-info">
+            <span id="selectedCount">0</span> selected
+          </div>
+          <div class="bulk-actions">
+            <button class="btn btn-sm" id="bulkTagBtn">Add Tags</button>
+            <button class="btn btn-sm" id="bulkExportBtn">Export</button>
+            <button class="btn btn-sm btn-danger" id="bulkDeleteBtn">Delete</button>
+            <button class="btn btn-sm" id="bulkClearBtn">Clear</button>
+          </div>
+        </div>
+
+        <!-- Screenshot container (grid or list) -->
+        <div class="screenshots-container" id="screenshotsContainer">
+          <!-- Grid view (default) -->
+          <div class="grid-view" id="gridView">
+            <!-- Dynamic screenshot cards -->
+          </div>
+
+          <!-- List view (table) -->
+          <div class="list-view" id="listView" hidden>
+            <table class="screenshots-table">
+              <thead>
+                <tr>
+                  <th width="40"><input type="checkbox" id="selectAll"></th>
+                  <th width="80">Preview</th>
+                  <th>Summary</th>
+                  <th width="120">App</th>
+                  <th width="100">Time</th>
+                  <th width="80">Score</th>
+                </tr>
+              </thead>
+              <tbody id="listViewBody">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty state -->
+          <div class="empty-state" id="emptyState" hidden>
+            <p>No screenshots in this folder</p>
+          </div>
+
+          <!-- Loading state -->
+          <div class="loading-state" id="loadingState">
+            Loading screenshots...
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+          <button class="btn btn-sm" id="prevPage" disabled>← Previous</button>
+          <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+          <button class="btn btn-sm" id="nextPage">Next →</button>
+        </div>
       </main>
+
+      <!-- RIGHT: Properties Sidebar (320px fixed) -->
+      <aside class="properties-sidebar" id="propertiesSidebar">
+        <div class="no-selection" id="noSelection">
+          <p>Select a screenshot to view details</p>
+        </div>
+
+        <div class="screenshot-details" id="screenshotDetails" hidden>
+          <!-- Preview -->
+          <div class="detail-section">
+            <img id="detailPreview" class="detail-preview" src="" alt="Preview">
+          </div>
+
+          <!-- Metadata -->
+          <div class="detail-section">
+            <h4>Metadata</h4>
+            <div class="detail-row">
+              <span class="detail-label">Session:</span>
+              <span class="detail-value" id="detailSession">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">App:</span>
+              <span class="detail-value" id="detailApp">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Window:</span>
+              <span class="detail-value" id="detailWindow">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Time:</span>
+              <span class="detail-value" id="detailTime">-</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Frame:</span>
+              <span class="detail-value" id="detailFrame">-</span>
+            </div>
+          </div>
+
+          <!-- Analysis -->
+          <div class="detail-section">
+            <h4>Analysis</h4>
+            <div class="detail-row">
+              <span class="detail-label">Relevance:</span>
+              <span class="detail-value">
+                <span class="relevance-badge" id="detailRelevance">-</span>
+              </span>
+            </div>
+            <div class="detail-row" id="detailSuccessRow" hidden>
+              <span class="detail-label">Status:</span>
+              <span class="detail-value">✓ Hero moment</span>
+            </div>
+            <div class="detail-summary">
+              <strong>AI Summary:</strong>
+              <p id="detailSummary">-</p>
+            </div>
+            <div class="detail-ocr">
+              <details>
+                <summary>OCR Text</summary>
+                <p id="detailOCR">-</p>
+              </details>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="detail-section">
+            <h4>Tags</h4>
+            <div class="tags-container" id="detailTags">
+              <!-- Tag chips -->
+            </div>
+            <button class="btn btn-sm" id="editTagsBtn">Edit Tags</button>
+          </div>
+
+          <!-- Actions -->
+          <div class="detail-section">
+            <h4>Actions</h4>
+            <button class="btn btn-block" id="openInFinderBtn">Open in Finder</button>
+            <button class="btn btn-block" id="copyImageBtn">Copy Image</button>
+            <button class="btn btn-block btn-danger" id="deleteBtn">Delete</button>
+          </div>
+        </div>
+      </aside>
+
     </div>
   </div>
 
-  <!-- Session Detail Modal -->
-  <div class="modal" id="sessionModal">
-    <div class="modal-content">
+  <!-- Tag editor modal -->
+  <div class="modal" id="tagModal">
+    <div class="modal-content small">
       <div class="modal-header">
-        <h2 id="modalTitle">Session Details</h2>
-        <button class="modal-close" id="modalClose">&times;</button>
+        <h2>Edit Tags</h2>
+        <button class="modal-close" id="tagModalClose">&times;</button>
       </div>
-      <div class="modal-body" id="modalBody">
-        <!-- Dynamic content -->
+      <div class="modal-body">
+        <input type="text" class="input" id="tagInput" placeholder="Add tags (comma-separated)">
+        <div class="tag-suggestions" id="tagSuggestions"></div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" id="tagCancelBtn">Cancel</button>
+          <button class="btn btn-primary" id="tagSaveBtn">Save</button>
+        </div>
       </div>
     </div>
   </div>
@@ -145,6 +379,85 @@
         <div class="form-actions">
           <button class="btn btn-secondary" id="captureCancelBtn">Cancel</button>
           <button class="btn btn-primary" id="captureStartBtn">Start Recording</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" id="settingsModalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Screenshot Storage Folder</label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" class="input" id="screenshotFolderInput" readonly>
+            <button class="btn btn-secondary" id="selectFolderBtn">Browse...</button>
+          </div>
+          <small style="color: var(--text-muted); margin-top: 4px; display: block;">
+            Choose where screenshots are saved
+          </small>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="settingsCloseBtn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Assembly Modal -->
+  <div class="modal" id="videoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Create Video</h2>
+        <button class="modal-close" id="videoModalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Session</label>
+          <select class="input" id="videoSessionSelect">
+            <option value="">Loading sessions...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Frame Selection</label>
+          <select class="input" id="videoModeSelect">
+            <option value="hero">Hero Moments (70%+ relevance)</option>
+            <option value="super-hero">Super Hero (80%+ relevance)</option>
+            <option value="all">All Frames</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="videoAutoCropCheck" checked>
+            Auto-crop windowed frames
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>Output Format</label>
+          <select class="input" id="videoFormatSelect">
+            <option value="mp4">MP4 Video (FFmpeg)</option>
+            <option value="jianying">JianYing Project (experimental)</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-secondary" id="videoCancelBtn">Cancel</button>
+          <button class="btn btn-primary" id="videoCreateBtn">Create Video</button>
+        </div>
+
+        <div id="videoProgress" hidden>
+          <p>Assembling video... <span id="videoProgressText">0/0 frames</span></p>
+          <div class="progress-bar">
+            <div class="progress-fill" id="videoProgressBar" style="width: 0%"></div>
+          </div>
         </div>
       </div>
     </div>

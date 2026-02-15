@@ -82,6 +82,17 @@ export function Header({ isRecording, screenshotCount = 0, onStartCapture, onSto
       >
         <Settings className="w-4 h-4 text-text-secondary" />
       </button>
+
+      <button
+        onClick={isRecording ? onStopCapture : onStartCapture}
+        className={`h-8 px-4 rounded-md text-sm font-medium transition-colors ${
+          isRecording
+            ? 'bg-[#3D1515] hover:bg-[#4D1A1A] text-[#FF9999] border border-[#3D1515]'
+            : 'bg-accent hover:bg-accent-hover text-white'
+        }`}
+      >
+        {isRecording ? '⏹ Stop' : '▶︎ Start Recording'}
+      </button>
     </header>
   )
 }
