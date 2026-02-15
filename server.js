@@ -116,6 +116,20 @@ app.get('/api/sessions', (req, res) => {
   }
 });
 
+// Get active recording session (must be BEFORE :id route)
+app.get('/api/sessions/active', (req, res) => {
+  try {
+    const activeSession = db.getActiveSession();
+
+    res.json({
+      hasActiveSession: Boolean(activeSession),
+      session: activeSession || null
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get session details with screenshots
 app.get('/api/sessions/:id', (req, res) => {
   try {
@@ -135,20 +149,6 @@ app.get('/api/sessions/:id', (req, res) => {
         // Normalize relevance score to 0-100 for display
         relevance_display: s.relevance_score !== null ? Math.round(s.relevance_score * 100) : null
       }))
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Get active recording session
-app.get('/api/sessions/active', (req, res) => {
-  try {
-    const activeSession = db.getActiveSession();
-
-    res.json({
-      hasActiveSession: Boolean(activeSession),
-      session: activeSession || null
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
