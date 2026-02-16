@@ -1,13 +1,17 @@
 {
   "name": "screen-story",
   "version": "1.0.0",
-  "description": "Turn screenpipe screenshots into short-form videos with AI summaries",
-  "main": "index.js",
   "type": "module",
+  "description": "Turn screenpipe screenshots into short-form videos with AI summaries",
+  "main": "main.cjs",
   "scripts": {
     "test": "node test-api.js",
     "export": "node export-screenshots.js",
-    "video": "node create-video.js"
+    "video": "node create-video.js",
+    "start:electron": "electron .",
+    "build:next": "cd ui-redesign && NEXT_PUBLIC_API_URL=http://localhost:4000 npm run build",
+    "build:electron": "electron-builder --dir",
+    "build": "npm run build:next && npm run build:electron"
   },
   "keywords": [
     "screenpipe",
@@ -27,7 +31,58 @@
     "dotenv": "^16.4.7",
     "express": "^5.2.1",
     "fluent-ffmpeg": "^2.1.3",
+    "next": "^14.0.0",
     "node-schedule": "^2.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.3",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.effyos.screenstory",
+    "productName": "Screen Story",
+    "files": [
+      "main.cjs",
+      "preload.js",
+      "server.js",
+      "capture-daemon.js",
+      "lib/**/*",
+      "ui-redesign/.next/**/*",
+      "ui-redesign/public/**/*",
+      "ui-redesign/package.json",
+      "ui-redesign/node_modules/**/*",
+      "node_modules/**/*",
+      "sessions/**/*",
+      "*.js",
+      "*.cjs",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "server.js",
+      "capture-daemon.js",
+      "lib/**/*",
+      "ui-redesign/.next/**/*",
+      "ui-redesign/public/**/*",
+      "node_modules/next/**/*",
+      "node_modules/react/**/*",
+      "node_modules/react-dom/**/*",
+      "node_modules/better-sqlite3/**/*",
+      "node_modules/sharp/**/*",
+      "node_modules/express/**/*",
+      "node_modules/cors/**/*",
+      "node_modules/axios/**/*",
+      "node_modules/@anthropic-ai/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "target": "dir",
+      "category": "public.app-category.productivity"
+    }
   }
 }
