@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { FileImage, Clock, HardDrive, Film, Monitor } from 'lucide-react'
+import { Image, Clock, HardDrive, FilmSlate, Monitor } from '@phosphor-icons/react'
 import { type Screenshot } from '@/lib/types'
 import { formatTime, formatFileSize, getRelevanceLabel } from '@/lib/utils'
 import { getThumbnailUrl } from '@/lib/api'
@@ -21,7 +21,7 @@ export function PropertiesPanel({
     return (
       <aside className="w-full h-full bg-bg-sidebar border-l border-border flex items-center justify-center">
         <div className="text-center text-text-tertiary text-sm">
-          <FileImage className="w-12 h-12 mx-auto mb-2 opacity-20" />
+          <Image size={48} className="mx-auto mb-2 opacity-20" />
           <p>Select a screenshot</p>
         </div>
       </aside>
@@ -55,9 +55,9 @@ export function PropertiesPanel({
           <div className="space-y-2">
             <PropertyRow icon={Clock} label="Time" value={formatTime(screenshot.timestamp)} />
             <PropertyRow icon={Monitor} label="App" value={screenshot.app_name} />
-            <PropertyRow icon={FileImage} label="Window" value={screenshot.window_title} />
+            <PropertyRow icon={Image} label="Window" value={screenshot.window_title} />
             <PropertyRow
-              icon={FileImage}
+              icon={Image}
               label="Dimensions"
               value={screenshot.window_info?.dimensions || `${screenshot.window_width} × ${screenshot.window_height}`}
             />
@@ -106,14 +106,14 @@ export function PropertiesPanel({
             onClick={onExportToJianying}
             className="w-full h-9 bg-accent hover:bg-accent-hover text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
-            <Film className="w-4 h-4" />
+            <FilmSlate size={16} />
             Export to JianYing
           </button>
           <button
             onClick={onCreateVideo}
             className="w-full h-9 bg-bg-surface hover:bg-bg-hover border border-border text-text-primary rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
           >
-            <Film className="w-4 h-4" />
+            <FilmSlate size={16} />
             Create Video
           </button>
         </div>
@@ -134,7 +134,7 @@ function PropertyRow({
   return (
     <div className="flex items-center justify-between text-sm h-7">
       <div className="flex items-center gap-2 text-text-tertiary">
-        <Icon className="w-3.5 h-3.5" />
+        <Icon size={14} />
         <span>{label}</span>
       </div>
       <span className="text-text-secondary font-mono text-xs tabular-nums">{value}</span>

@@ -17,6 +17,10 @@ contextBridge.exposeInMainWorld('electron', {
     ipcRenderer.send('notification', { title, body });
   },
 
+  // Folder selection
+  selectScreenshotFolder: () => ipcRenderer.invoke('select-screenshot-folder'),
+  getScreenshotFolder: () => ipcRenderer.invoke('get-screenshot-folder'),
+
   // Check if running in Electron
   isElectron: true
 });

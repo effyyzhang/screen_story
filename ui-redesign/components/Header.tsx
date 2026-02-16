@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Search, Settings, Circle } from 'lucide-react'
+import { MagnifyingGlass, Gear, Circle, Play, Stop, VideoCamera } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 interface HeaderProps {
@@ -20,7 +20,7 @@ export function Header({ isRecording, screenshotCount = 0, searchQuery, onSearch
     <header className="h-14 bg-[#111111] border-b border-border flex items-center px-5 gap-6 flex-shrink-0">
       {/* Logo */}
       <div className="flex items-center gap-2">
-        <span className="text-lg">📹</span>
+        <VideoCamera size={20} weight="duotone" className="text-accent" />
         <h1 className="text-base font-medium">Screen Story</h1>
       </div>
 
@@ -30,7 +30,7 @@ export function Header({ isRecording, screenshotCount = 0, searchQuery, onSearch
         animate={{ width: searchFocused ? '500px' : '400px' }}
         transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
       >
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
+        <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
         <input
           type="search"
           placeholder="Search screenshots..."
@@ -84,18 +84,28 @@ export function Header({ isRecording, screenshotCount = 0, searchQuery, onSearch
         className="w-8 h-8 flex items-center justify-center hover:bg-bg-hover rounded-md transition-colors"
         aria-label="Settings"
       >
-        <Settings className="w-4 h-4 text-text-secondary" />
+        <Gear className="w-4 h-4 text-text-secondary" />
       </button>
 
       <button
         onClick={isRecording ? onStopCapture : onStartCapture}
-        className={`h-8 px-4 rounded-md text-sm font-medium transition-colors ${
+        className={`h-8 px-4 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
           isRecording
             ? 'bg-[#3D1515] hover:bg-[#4D1A1A] text-[#FF9999] border border-[#3D1515]'
             : 'bg-accent hover:bg-accent-hover text-white'
         }`}
       >
-        {isRecording ? '⏹ Stop' : '▶︎ Start Recording'}
+        {isRecording ? (
+          <>
+            <Stop size={16} weight="fill" />
+            <span>Stop</span>
+          </>
+        ) : (
+          <>
+            <Play size={16} weight="fill" />
+            <span>Start Recording</span>
+          </>
+        )}
       </button>
     </header>
   )

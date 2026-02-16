@@ -68,7 +68,7 @@ export function useScreenshots(
               // Deduplicate by ID
               const combined = [...result.screenshots, ...prev.screenshots]
               const unique = combined.reduce((acc, curr) => {
-                if (!acc.find((s) => s.id === curr.id)) {
+                if (!acc.find((s: Screenshot) => s.id === curr.id)) {
                   acc.push(curr)
                 }
                 return acc

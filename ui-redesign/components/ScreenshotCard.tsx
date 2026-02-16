@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Eye, Download } from 'lucide-react'
+import { Eye, DownloadSimple } from '@phosphor-icons/react'
 import { type Screenshot } from '@/lib/types'
 import { formatTime, getRelevanceColor } from '@/lib/utils'
 import { getThumbnailUrl } from '@/lib/api'
@@ -89,7 +89,7 @@ export function ScreenshotCard({ screenshot, onClick }: ScreenshotCardProps) {
                   // Handle view
                 }}
               >
-                <Eye className="w-3 h-3" />
+                <Eye size={12} />
                 View
               </button>
               <button
@@ -99,7 +99,7 @@ export function ScreenshotCard({ screenshot, onClick }: ScreenshotCardProps) {
                   // Handle export
                 }}
               >
-                <Download className="w-3 h-3" />
+                <DownloadSimple size={12} />
                 Export
               </button>
             </div>

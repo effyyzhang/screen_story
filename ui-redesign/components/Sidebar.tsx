@@ -5,13 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Camera,
   Star,
-  CheckCircle2,
-  ChevronRight,
-  ChevronDown,
+  CheckCircle,
+  CaretRight,
+  CaretDown,
   Folder,
-  Calendar,
+  CalendarBlank,
   Monitor,
-} from 'lucide-react'
+} from '@phosphor-icons/react'
 import { type FilterType, type FolderCounts } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -56,7 +56,7 @@ export function Sidebar({
     {
       id: 'success' as FilterType,
       label: 'Success',
-      icon: CheckCircle2,
+      icon: CheckCircle,
       count: folderCounts?.success.success || 0,
     },
   ]
@@ -102,7 +102,7 @@ export function Sidebar({
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
                 )}
-                <Icon className="w-4 h-4 flex-shrink-0" />
+                <Icon size={16} className="flex-shrink-0" />
                 <span className="flex-1 text-left truncate">{item.label}</span>
                 <span className="text-xs text-text-tertiary tabular-nums">{item.count}</span>
               </motion.button>
@@ -119,9 +119,9 @@ export function Sidebar({
         >
           <span>By App</span>
           {expandedSections.apps ? (
-            <ChevronDown className="w-3 h-3" />
+            <CaretDown size={12} weight="bold" />
           ) : (
-            <ChevronRight className="w-3 h-3" />
+            <CaretRight size={12} weight="bold" />
           )}
         </button>
         <AnimatePresence initial={false}>
@@ -153,7 +153,7 @@ export function Sidebar({
                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                       />
                     )}
-                    <Monitor className="w-4 h-4 flex-shrink-0" />
+                    <Monitor size={16} className="flex-shrink-0" />
                     <span className="flex-1 text-left truncate">{app.name}</span>
                     <span className="text-xs text-text-tertiary tabular-nums">{app.count}</span>
                   </button>
@@ -172,9 +172,9 @@ export function Sidebar({
         >
           <span>By Time</span>
           {expandedSections.time ? (
-            <ChevronDown className="w-3 h-3" />
+            <CaretDown size={12} weight="bold" />
           ) : (
-            <ChevronRight className="w-3 h-3" />
+            <CaretRight size={12} weight="bold" />
           )}
         </button>
         <AnimatePresence initial={false}>
@@ -206,7 +206,7 @@ export function Sidebar({
                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                       />
                     )}
-                    <Calendar className="w-4 h-4 flex-shrink-0" />
+                    <CalendarBlank size={16} className="flex-shrink-0" />
                     <span className="flex-1 text-left truncate">{filter.label}</span>
                     <span className="text-xs text-text-tertiary tabular-nums">{filter.count}</span>
                   </button>
@@ -225,9 +225,9 @@ export function Sidebar({
         >
           <span>Sessions</span>
           {expandedSections.sessions ? (
-            <ChevronDown className="w-3 h-3" />
+            <CaretDown size={12} weight="bold" />
           ) : (
-            <ChevronRight className="w-3 h-3" />
+            <CaretRight size={12} weight="bold" />
           )}
         </button>
         <AnimatePresence initial={false}>
@@ -261,7 +261,7 @@ export function Sidebar({
                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                       />
                     )}
-                    <Folder className="w-4 h-4 flex-shrink-0" />
+                    <Folder size={16} className="flex-shrink-0" />
                     <span className="flex-1 text-left truncate">{session.name}</span>
                     <span className="text-xs text-text-tertiary tabular-nums">
                       {session.count}

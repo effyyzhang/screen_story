@@ -177,24 +177,17 @@ app.get('/api/search', (req, res) => {
 // Get capture status
 app.get('/api/capture/status', async (req, res) => {
   try {
-    const { stdout } = await execAsync('node capture-daemon.js status');
-    const isRunning = stdout.includes('✅ Capture daemon is running');
-
-    let currentSession = null;
-    if (isRunning) {
-      const match = stdout.match(/Session: (.+)/);
-      if (match) {
-        currentSession = match[1].trim();
-      }
-    }
+    const db = new ScreenStoryDB();
+    const activeSession = db.getActiveSession();
+    db.close();
 
     res.json({
-      running: isRunning,
-      session: currentSession,
-      output: stdout
+      running: !!activeSession,
+      session: activeSession ? activeSession.session_name : null,
+      sessionId: activeSession ? activeSession.id : null
     });
   } catch (error) {
-    res.json({ running: false, session: null });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -207,14 +200,15 @@ app.post('/api/capture/start', async (req, res) => {
       return res.status(400).json({ error: 'Session name is required' });
     }
 
-    const { stdout } = await execAsync(
-      `node capture-daemon.js start "${sessionName}" "${description || 'Screen recording session'}"`
-    );
+    const db = new ScreenStoryDB();
+    const sessionId = db.createSession(sessionName, description || 'Screen recording session', false);
+    db.close();
 
     res.json({
       success: true,
-      output: stdout,
-      session: sessionName
+      session: sessionName,
+      sessionId,
+      message: 'Session created - daemon will start capturing automatically'
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -224,10 +218,21 @@ app.post('/api/capture/start', async (req, res) => {
 // Stop capture
 app.post('/api/capture/stop', async (req, res) => {
   try {
-    const { stdout } = await execAsync('node capture-daemon.js stop');
+    const db = new ScreenStoryDB();
+    const activeSession = db.getActiveSession();
+
+    if (!activeSession) {
+      db.close();
+      return res.status(400).json({ error: 'No active session to stop' });
+    }
+
+    db.stopSession(activeSession.id);
+    db.close();
+
     res.json({
       success: true,
-      output: stdout
+      session: activeSession.session_name,
+      message: 'Session stopped'
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

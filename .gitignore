@@ -12,3 +12,18 @@ sessions/*.db-shm
 sessions/*.db-wal
 videos/
 test-*.js
+
+# Electron build artifacts
+dist/
+electron/dist/
+*.dmg
+*.zip
+*.blockmap
+
+# Database files
+screen_story.db
+screen_story.db-shm
+screen_story.db-wal
+
+# Build outputs
+public/
